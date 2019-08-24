@@ -1,5 +1,5 @@
 --- build_visit3_0_1.orig	2019-07-12 11:11:40.000000000 -0500
-+++ build_visit3_0_1	2019-08-24 00:13:37.159529319 -0500
++++ build_visit3_0_1	2019-08-24 13:02:29.707244166 -0500
 @@ -2617,6 +2617,15 @@
              info  "Configuring parallel with mpich build: "
              info  "  PAR_COMPILER: $MPICH_COMPILER "
@@ -16,13 +16,35 @@
              return 0
          fi
  
-@@ -10691,6 +10700,13 @@
+@@ -4005,6 +4014,16 @@
+         FEATURES="${FEATURES} -DCPACK_RPM_SPEC_MORE_DEFINE:STRING=\"%global_python_bytecompile_errors_terminate_build 0\""
+     fi
+ 
++    # LJJ EDIT: VisIt tries to install a Qt directory called "xcbglintegrations" which does not exist
++    patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${VISIT_FILE%.tar*}/src/CMake/FindVisItQt.cmake <<\EOF
++274,275c274,275
++<       install(DIRECTORY ${VISIT_QT_DIR}/plugins/xcbglintegrations
++<               DESTINATION ${VISIT_INSTALLED_VERSION_LIB}/qtplugins)
++---
++>       #install(DIRECTORY ${VISIT_QT_DIR}/plugins/xcbglintegrations
++>       #        DESTINATION ${VISIT_INSTALLED_VERSION_LIB}/qtplugins)
++EOF
++
+     issue_command "${CMAKE_BIN}" ${FEATURES} ../src
+ 
+     if [[ $? != 0 ]] ; then
+@@ -10691,6 +10710,18 @@
          --with-jpeg=\"$VISITDIR/${VTK_INSTALL_DIR}/${VTK_VERSION}/$VISITARCH/include/vtk-${VTK_SHORT_VERSION}/vtkjpeg\",\"$VISITDIR/${VTK_INSTALL_DIR}/${VTK_VERSION}/$VISITARCH/lib\" \
          --with-szlib=\"$VISITDIR/szip/$SZIP_VERSION/$VISITARCH\" \
          --with-zlib=\"$VISITDIR/zlib/$ZLIB_VERSION/$VISITARCH\" --disable-netcdf"
 +
 +        # LJJ EDIT: Files in mfhdf/ncgen must be linked to librpc.a
-+        sed -i 's/\bLIBS = -lsz -lvtkjpeg-8.1 -lz -lm\b/& \/usr\/lib\/dietlibc\/lib-x86_64\/librpc.a/' ${VISIT_INSTALLATION_BUILD_DIR}/${HDF4_BUILD_DIR}/mfhdf/ncgen/Makefile
++        patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${HDF4_BUILD_DIR}/mfhdf/ncgen/Makefile <<\EOF
++161c161
++< LIBS = -lsz -lvtkjpeg-8.1 -lz -lm
++---
++> LIBS = -lsz -lvtkjpeg-8.1 -lz -lm /usr/lib/dietlibc/lib-x86_64/librpc.a
++EOF
 +
 +        # LJJ EDIT: The rpc headers are in /usr/include/tirpc/rpc instead of /usr/include/rpc
 +        export CPATH=/usr/include/tirpc
@@ -30,7 +52,7 @@
          if [[ $? != 0 ]] ; then
              warn "HDF4 configure failed.  Giving up.\n"\
                   "You can see the details of the build failure at $HDF4_BUILD_DIR/config.log\n"
-@@ -10770,6 +10786,10 @@
+@@ -10770,6 +10801,10 @@
      fi
      cd "$START_DIR"
      info "Done with HDF4"
@@ -41,7 +63,7 @@
      return 0
  }
  
-@@ -11448,14 +11468,7 @@
+@@ -11448,14 +11483,7 @@
          cf_zlib="--with-zlib=${zlib_dir}"
      fi
  
@@ -57,7 +79,7 @@
  
      cf_build_thread=""
      if [[ "$DO_THREAD_BUILD" == "yes" ]]; then
-@@ -11479,6 +11492,20 @@
+@@ -11479,6 +11507,20 @@
          mkdir build_$bt
          pushd build_$bt
  
@@ -78,30 +100,45 @@
          cf_build_parallel=""
          cf_par_suffix=""
          if [[ "$bt" == "serial" ]]; then
-@@ -12235,6 +12262,10 @@
+@@ -12235,6 +12277,15 @@
          fi
      fi
  
 +    # LJJ EDIT: Patch LLVM source to allow compilation with newer compilers
 +    # (see https://bugzilla.redhat.com/attachment.cgi?id=1389687&action=diff)
-+    sed -i "s/Expected<std::vector<char>> readMem/Expected<std::vector<uint8_t>> readMem/" ${VISIT_INSTALLATION_BUILD_DIR}/${BV_LLVM_SRC_DIR}/include/llvm/ExecutionEngine/Orc/OrcRemoteTargetClient.h
++    patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${BV_LLVM_SRC_DIR}/include/llvm/ExecutionEngine/Orc/OrcRemoteTargetClient.h <<\EOF
++716c716
++<   Expected<std::vector<char>> readMem(char *Dst, JITTargetAddress Src,
++---
++>   Expected<std::vector<uint8_t>> readMem(char *Dst, JITTargetAddress Src,
++EOF
 +
      cd "$START_DIR"
      cd ${BV_LLVM_BUILD_DIR} || error "Couldn't cd to llvm build dir."
  
-@@ -14266,6 +14297,11 @@
+@@ -14266,6 +14317,21 @@
          par_build_types="$par_build_types parallel"
      fi
  
 +    # LJJ EDIT: Fix issue in moab install caused by different glibc edition
 +    # (see https://github.com/ljacobson64/build_scripts/commit/37238c0bf532d8075b8b39454508c87f446f4cab)
-+    sed -i "s/HUGE/HUGE_VAL/" ${VISIT_INSTALLATION_BUILD_DIR}/${MOAB_BUILD_DIR}/src/LocalDiscretization/LinearTet.cpp
-+    sed -i "s/HUGE/HUGE_VAL/" ${VISIT_INSTALLATION_BUILD_DIR}/${MOAB_BUILD_DIR}/src/LocalDiscretization/LinearTri.cpp
++    patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${MOAB_BUILD_DIR}/src/LocalDiscretization/LinearTet.cpp <<\EOF
++107c107
++<       double resl = HUGE;
++---
++>       double resl = HUGE_VAL;
++EOF
++    patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${MOAB_BUILD_DIR}/src/LocalDiscretization/LinearTri.cpp <<\EOF
++104c104
++<       double resl = HUGE;
++---
++>       double resl = HUGE_VAL;
++EOF
 +
      for bt in $par_build_types; do 
  
          mkdir build_$bt
-@@ -19032,7 +19068,10 @@
+@@ -19032,7 +19098,10 @@
                  Public License (LGPL) version 2.1 or \
                  the GNU General Public License (GPL) version 3"
      info $QT_LIC_MSG
@@ -113,20 +150,23 @@
      if [[ "$RESPONSE" != "yes" ]] ; then
          info $QT_CONFIRM_MSG
          read RESPONSE
-@@ -19126,6 +19165,12 @@
+@@ -19126,6 +19195,15 @@
          fi
      fi
  
 +    # LJJ EDIT: Must add another #include line in physicalsocketserver.cc to fix a build error
-+    # (see https://bugreports.qt.io/browse/QTBUG-76957)
++    # (see https://bugreports.qt.io/browse/QTBUG-76963)
 +    if [[ "${QT_VERSION}" == "5.12.4" ]] ; then
-+        sed -i "/#include <unistd.h>/a #include <linux/sockios.h>" ${VISIT_INSTALLATION_BUILD_DIR}/${QT_BUILD_DIR}/qtwebengine/src/3rdparty/chromium/third_party/webrtc/rtc_base/physicalsocketserver.cc
++        patch -f -p0 ${VISIT_INSTALLATION_BUILD_DIR}/${QT_BUILD_DIR}/qtwebengine/src/3rdparty/chromium/third_party/webrtc/rtc_base/physicalsocketserver.cc <<\EOF
++32d31
++< #include <linux/sockios.h>
++EOF
 +    fi
 +
      #
      # Platform specific configuration
      #
-@@ -19237,7 +19282,12 @@
+@@ -19237,7 +19315,12 @@
      qt_flags="${qt_flags} -no-qml-debug"
  
      if [[ "$OPSYS" == "Linux" ]] ; then
