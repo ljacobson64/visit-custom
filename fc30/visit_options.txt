@@ -1,0 +1,165 @@
+Processing bsd license.
+Setting VisIt info...
+Usage: ./build_visit3_0_1 [options]
+--skip-opengl-context-check Skip check for minimum OpenGL context. [false]
+
+BUILD OPTIONS
+
+--build-mode         VisIt build mode (Debug or Release) [Release]
+--create-rpm         Enable creation of RPM packages [no]
+--cflag              Append a flag to CFLAGS [ -m64 -fPIC]
+--cxxflag            Append a flag to CXXFLAGS [ -m64 -fPIC]
+--cflags             Explicitly set CFLAGS [ -m64 -fPIC]
+--cxxflags           Explicitly set CXXFLAGS [ -m64 -fPIC]
+--cc                 Explicitly set C_COMPILER [gcc]
+--cxx                Explicitly set CXX_COMPILER [g++]
+--debug              Add '-g' to C[XX]FLAGS [no]
+--makeflags <flags>  Flags to 'make' []
+--fortran            Enable compilation of Fortran sources [no]
+--fc                 Explicitly set FC_COMPILER
+                     [/usr/bin/gfortran]
+--no-qt-silent       Disable make silent operation for QT. [no]
+--parallel           Enable parallel build, display MPI prompt [no]
+--static             Build using static linking [no]
+--installation-build-dir <path> 
+                     Specify the directory visit will use for building []
+
+INSTALLATION OPTIONS
+
+--arch <architecture> Set architecture [linux-x86_64_gcc-7.4]
+	     This variable is used in constructing the 3rd party
+	     library path; usually set to something like
+	     'linux_gcc-3.4.6' or 'Darwin_gcc-4.0.1'
+--group      Group name of installed libraries [visit]
+--thirdparty-path </path/to/directory> 
+             Specify the root directory name under which the 3rd party
+             libraries have been installed.  If defined, it would typically
+             mean the 3rd party libraries are pre-built and are installed
+             somewhere like /usr/gapps/visit. [./third_party]
+
+GROUPING
+
+--required      All required libraries [yes]
+--optional      All optional libraries [no]
+--no-thirdparty Do not build required 3rd party libraries [no]
+--all-io        Build all available I/O libraries [no]
+--dbio-only     Disables EVERYTHING but I/O. [no]
+--nonio         Build non I/O libraries [no]
+--advanced      Must be manually downloaded [no]
+
+
+VISIT-SPECIFIC OPTIONS
+
+--install-network    Install specific network config files. []
+--prefix <prefix>    The directory to which VisIt should be installed once it is built []
+--tarball <file>     tarball to extract VisIt from [visit3.0.1.tar.gz]
+--version <version>  The VisIt version to build [3.0.1]
+--no-hostconf        Do not create host.conf file. [yes]
+--java               Build with the Java client library [no]
+--paradis            Build with the paraDIS client library [no]
+--xdb                Enable FieldView XDB plugin. [no]
+--visit              Build VisIt [yes]
+
+THIRD-PARTY LIBRARIES
+  A download attempt will be made for all files which do not exist.
+
+  REQUIRED -- These are built by default unless --no-thirdparty flag is used.
+
+--cmake              Build CMake
+--system-cmake       Use the system installed CMake []
+--alt-cmake-dir      Use CMake from an alternative directory []
+--bin-cmake-dir      Use CMake from an alternative binary directory []
+--python             Build Python
+--system-python      Use the system installed Python []
+--alt-python-dir     Use Python from an alternative directory []
+--mpi4py             Build mpi4py with Python []
+--qt                 Build Qt5
+--system-qt          Use the system installed Qt []
+--alt-qt-dir         Use Qt from alternative directory []
+--qwt                Build with Qwt [yes]
+--alt-qwt-dir        Use Qwt from an alternative directory []
+--vtk                Build VTK
+--system-vtk         Use the system installed VTK []
+--alt-vtk-dir        Use VTK from an alternative directory []
+
+  OPTIONAL
+
+--adios              Build ADIOS [no]
+--alt-adios-dir      Use ADIOS from an alternative directory []
+--adios2             Build ADIOS2 [no]
+--alt-adios2-dir     Use ADIOS2 from an alternative directory []
+--advio              Build AdvIO [no]
+--boost              Build BOOST [no]
+--alt-boost-dir      Use Boost from an alternative directory []
+--boxlib             Build Boxlib [no]
+--cfitsio            Build CFITSIO [no]
+--cgns               Build CGNS [no]
+--conduit            Build Conduit [no]
+--embree             Build embree [no]
+--fastbit            Build FastBit [no]
+                     NOTE: FastBit not available for download from web
+--fastquery          Build FastQuery [no]
+                     NOTE: FastQuery not available for download from web
+--gdal               Build GDAL [no]
+--glu                Build GLU [no]
+--h5part             Build H5Part [no]
+--hdf4               Build HDF4 [no]
+--hdf5               Build HDF5 [no]
+--alt-hdf5-dir       Use HDF5 from an alternative directory []
+--icet               Build Ice-T (parallel rendering lib) [no]
+--no-icet            Prevent Ice-T from being built [no]
+                     NOTE: Ice-T is automatically built with --enable-parallel.
+--ispc               Build ISPC [no]
+--llvm               Build LLVM [no]
+--mdsplus            Build MDSplus [no]
+--mesagl             Build MesaGL [no]
+--mfem               Build mfem support [no]
+--mili               Build Mili [no]
+--moab               Build moab support [no]
+--mpich              Build MPICH support [no]
+--mxml               Build Mxml [no]
+--nektarpp           Build Nektar++ [no]
+--alt-nektarpp-dir   Use Nektar++ from an alternative directory []
+--netcdf             Build NetCDF [no]
+--alt-netcdf-dir     Use NetCDF from an alternative directory []
+--openexr            Build OpenEXR [no]
+--openssl            Build openssl support [no]
+--osmesa             Build OSMesa [no]
+--ospray             Build OSPRay rendering support [no]
+--p7zip              Build P7ZIP support [no]
+--pidx               Build pidx [no]
+--alt-pidx-dir       Use pidx from an alternative directory []
+--pyside             Build PySide [yes]
+--alt-pyside-dir     Use PySide from an alternative directory []
+--silo               Build Silo support [no]
+--silex              Enable silex when building Silo [no]
+--szip               Build with SZIP [no]
+--tbb                Build TBB [no]
+--tcmalloc           Build tcmalloc from Google's perftools [no]
+--uintah             Build Uintah [no]
+--alt-uintah-dir     Use Uintah from an alternative directory []
+--vtkh               Build VTKh support [no]
+--vtkm               Build VTKm support [no]
+--alt-vtkm-dir       Use VTKm from an alternative directory []
+--xdmf               Build Xdmf [no]
+--zlib               Build ZLIB support [no]
+
+GIT OPTIONS
+
+--git                      Obtain the VisIt source code
+                           from the GIT server [no]
+
+MISC OPTIONS
+
+--bv-debug           Enable debugging for this script [no]
+--dry-run            Dry run of the presented options [no]
+--download-only      Only download the specified packages [no]
+--engine-only        Only build the compute engine. [no]
+-h, --help           Display this help message. [no]
+--print-vars         Display user settable environment variables [no]
+--server-components-only 
+                     Only build VisIt's server components
+                     (mdserver,vcl,engine). [no]
+--stdout             Write build log to stdout [no]
+--write-unified-file <filename>
+                     Write single unified build_visit file using the provided filename []
