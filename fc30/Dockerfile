@@ -51,3 +51,8 @@ RUN ${base_dir}/build_visit3_0_1 $(eval echo ${build_options}) --no-visit 2>&1 |
 
 # Build VisIt
 RUN ${base_dir}/build_visit3_0_1 $(eval echo ${build_options}) 2>&1 | tee -a ${base_dir}/build_visit.log
+
+# Generate tarball
+RUN cd ${build_dir}/visit3.0.1/build && \
+    sed -i "s/CPACK_RPM_SPEC_MORE_DEFINE \"/CPACK_RPM_SPEC_MORE_DEFINE /" CPackConfig.cmake && \
+    make package

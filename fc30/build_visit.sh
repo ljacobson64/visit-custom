@@ -55,3 +55,8 @@ build_string+=" --stdout"                               # Write build log to std
 
 # Build VisIt
 ./build_visit3_0_1 ${build_string} 2>&1 | tee -a build_visit.log
+
+# Generate tarball
+cd ${build_dir}/visit3.0.1/build
+sed -i "s/CPACK_RPM_SPEC_MORE_DEFINE \"/CPACK_RPM_SPEC_MORE_DEFINE /" CPackSourceConfig.cmake
+make package
