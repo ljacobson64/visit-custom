@@ -23,10 +23,6 @@ RUN cd ${base_dir} && patch -p0 < build_visit3_0_1.patch
 ENV ZLIB_VERSION=1.2.9
 RUN cd ${build_dir} && wget -nv https://sourceforge.net/projects/libpng/files/zlib/${ZLIB_VERSION}/zlib-${ZLIB_VERSION}.tar.gz
 
-# Use newer version of QT (default version has issues with GCC 9)
-ENV QT_VERSION=5.12.4
-RUN cd ${build_dir} && wget -nv https://download.qt.io/archive/qt/5.12/${QT_VERSION}/single/qt-everywhere-src-${QT_VERSION}.tar.xz
-
 # Build options
 ENV build_options="--skip-opengl-context-check \
                    --build-mode Release \
